@@ -1,0 +1,36 @@
+name: Maven Build
+
+on:
+  push:
+    branches:
+      - main  # Runs on every push to main
+  pull_request:
+    branches:
+      - main  # Runs on PRs to main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'  # Or adopt, zulu, temurin
+          java-version: '21'
+          cache: maven  # Caches dependencies for faster builds
+
+      - name: Build with Maven
+        run: mvn -B clean package --file pom.xml
+
+      - name: Run Tests
+        run: mvn test
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-java-app
+          path: target/*.jar
